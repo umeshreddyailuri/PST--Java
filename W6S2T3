@@ -1,0 +1,43 @@
+import java.io.*;
+import java.util.*;
+
+class Result {
+
+    public static String twoStrings(String s1, String s2) {
+
+        boolean[] present = new boolean[26];
+
+        for (char c : s1.toCharArray()) {
+            present[c - 'a'] = true;
+        }
+
+        for (char c : s2.toCharArray()) {
+            if (present[c - 'a']) {
+                return "YES";
+            }
+        }
+
+        return "NO";
+    }
+}
+
+public class Solution {
+
+    public static void main(String[] args) throws IOException {
+
+        BufferedReader br =
+            new BufferedReader(new InputStreamReader(System.in));
+
+        int p = Integer.parseInt(br.readLine().trim());
+
+        for (int i = 0; i < p; i++) {
+
+            String s1 = br.readLine().trim();
+            String s2 = br.readLine().trim();
+
+            System.out.println(Result.twoStrings(s1, s2));
+        }
+
+        br.close();
+    }
+}
