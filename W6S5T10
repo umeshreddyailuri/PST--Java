@@ -1,0 +1,196 @@
+import java.io.*;
+import java.util.*;
+
+class Result {
+
+    // Sparse Table for Range Maximum Query
+    static class RMQ {
+        int[][] table;
+        int[] log;
+
+        RMQ(int[] arr) {
+            int n = arr.length;
+
+            log = new int[n + 1];
+            for (int i = 2; i <= n; i++) {
+                log[i] = log[i / 2] + 1;
+            }
+
+            int levels = log[n] + 1;
+            table = new int[levels][n];
+
+            // Level 0
+            System.arraycopy(arr, 0, table[0], 0, n);
+
+            // Build sparse table
+            for (int k = 1; k < levels; k++) {
+                int len = 1 << k;
+                int half = len >> 1;
+
+                for (int i = 0; i + len <= n; i++) {
+                    table[k][i] = Math.max(
+                        table[k - 1][i],
+                        table[k - 1][i + half]
+                    );
+                }
+            }
+        }
+
+        int query(int left, int right) {
+            if (left > right) {
+                return 0;
+            }
+
+            int length = right - left + 1;
+            int k = log[length];
+
+            return Math.max(
+                table[k][left],
+                table[k][right - (1 << k) + 1]
+            );
+        }
+    }
+
+    // Manacher's Algorithm
+    static int[] manacher(int[] a) {
+
+        int n = a.length;
+        int[] radius = new int[n];
+
+        int center = 0;
+        int right = 0;
+
+        for (int i = 0; i < n; i++) {
+
+            if (i < right) {
+                radius[i] = Math.min(
+                    right - i,
+                    radius[2 * center - i]
+                );
+            } else {
+                radius[i] = 0;
+            }
+
+            while (i - radius[i] - 1 >= 0 &&
+                   i + radius[i] + 1 < n &&
+                   a[i - radius[i] - 1] == a[i + radius[i] + 1]) {
+                radius[i]++;
+            }
+
+            if (i + radius[i] > right) {
+                center = i;
+                right = i + radius[i];
+            }
+        }
+
+        return radius;
+    }
+
+    public static List<Integer> circularPalindromes(String s) {
+
+        int n = s.length();
+
+        // Duplicate the string
+        String doubled = s + s;
+
+        /*
+         * Transform:
+         *
+         * abc
+         *
+         * becomes
+         *
+         * #a#b#c#
+         *
+         * This lets us handle odd and even palindromes together.
+         */
+        int transformedLength = 4 * n + 1;
+        int[] transformed = new int[transformedLength];
+
+        Arrays.fill(transformed, 26);
+
+        for (int i = 0; i < 2 * n; i++) {
+            transformed[2 * i + 1] = doubled.charAt(i) - 'a';
+        }
+
+        // Find palindrome radius for every center
+        int[] radius = manacher(transformed);
+
+        /*
+         * A palindrome cannot be longer than n,
+         * because each rotation has length n.
+         */
+        for (int i = 0; i < transformedLength; i++) {
+            radius[i] = Math.min(radius[i], n);
+        }
+
+        // Range Maximum Query
+        RMQ rmq = new RMQ(radius);
+
+        List<Integer> answer = new ArrayList<>(n);
+
+        /*
+         * For every rotation:
+         *
+         * rotation i starts at i
+         * and ends at i + n - 1.
+         */
+        for (int i = 0; i < n; i++) {
+
+            int L = 2 * i + 1;
+            int R = 2 * (i + n - 1) + 1;
+
+            int low = 1;
+            int high = n;
+            int best = 1;
+
+            // Binary search for maximum palindrome length
+            while (low <= high) {
+
+                int mid = (low + high) / 2;
+
+                int leftCenter = L + mid - 1;
+                int rightCenter = R - mid + 1;
+
+                if (leftCenter <= rightCenter &&
+                    rmq.query(leftCenter, rightCenter) >= mid) {
+
+                    best = mid;
+                    low = mid + 1;
+
+                } else {
+                    high = mid - 1;
+                }
+            }
+
+            answer.add(best);
+        }
+
+        return answer;
+    }
+}
+
+public class Solution {
+
+    public static void main(String[] args) throws IOException {
+
+        BufferedReader br =
+            new BufferedReader(new InputStreamReader(System.in));
+
+        int n = Integer.parseInt(br.readLine().trim());
+
+        String s = br.readLine().trim();
+
+        List<Integer> result = Result.circularPalindromes(s);
+
+        StringBuilder output = new StringBuilder();
+
+        for (int value : result) {
+            output.append(value).append('\n');
+        }
+
+        System.out.print(output);
+
+        br.close();
+    }
+}
