@@ -1,0 +1,43 @@
+import java.util.*;
+
+class BrowserHistory {
+
+    ArrayList<String> history;
+    int current;
+
+    public BrowserHistory(String homepage) {
+        history = new ArrayList<>();
+        history.add(homepage);
+        current = 0;
+    }
+
+    public void visit(String url) {
+
+        // Remove all forward history
+        while (history.size() > current + 1) {
+            history.remove(history.size() - 1);
+        }
+
+        // Add new URL
+        history.add(url);
+
+        // Move to the new page
+        current++;
+    }
+
+    public String back(int steps) {
+
+        // Move back, but not before the first page
+        current = Math.max(0, current - steps);
+
+        return history.get(current);
+    }
+
+    public String forward(int steps) {
+
+        // Move forward, but not beyond the last page
+        current = Math.min(history.size() - 1, current + steps);
+
+        return history.get(current);
+    }
+}
