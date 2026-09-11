@@ -1,0 +1,77 @@
+import java.util.*;
+
+class UndergroundSystem {
+
+    // id -> [stationName, checkInTime]
+    private HashMap<Integer, Pair> checkInMap;
+
+    // "start#end" -> [totalTime, numberOfTrips]
+    private HashMap<String, double[]> travelMap;
+
+    public UndergroundSystem() {
+        checkInMap = new HashMap<>();
+        travelMap = new HashMap<>();
+    }
+
+    public void checkIn(int id, String stationName, int t) {
+        checkInMap.put(id, new Pair(stationName, t));
+    }
+
+    public void checkOut(int id, String stationName, int t) {
+
+        // Get customer's check-in information
+        Pair checkIn = checkInMap.get(id);
+
+        String startStation = checkIn.station;
+        int startTime = checkIn.time;
+
+        // Calculate travel time
+        int travelTime = t - startTime;
+
+        // Create a unique key for start -> end
+        String key = startStation + "#" + stationName;
+
+        // If route doesn't exist, create it
+        if (!travelMap.containsKey(key)) {
+            travelMap.put(key, new double[]{0, 0});
+        }
+
+        // Update total time and number of trips
+        double[] data = travelMap.get(key);
+        data[0] += travelTime;
+        data[1]++;
+
+        // Customer is no longer checked in
+        checkInMap.remove(id);
+    }
+
+    public double getAverageTime(String startStation, String endStation) {
+
+        String key = startStation + "#" + endStation;
+
+        double[] data = travelMap.get(key);
+
+        // total time / number of trips
+        return data[0] / data[1];
+    }
+
+    // Helper class to store check-in information
+    class Pair {
+        String station;
+        int time;
+
+        Pair(String station, int time) {
+            this.station = station;
+            this.time = time;
+        }
+    }
+}
+
+/**
+ * Your UndergroundSystem object will be instantiated and called as such:
+ *
+ * UndergroundSystem obj = new UndergroundSystem();
+ * obj.checkIn(id, stationName, t);
+ * obj.checkOut(id, stationName, t);
+ * double param_3 = obj.getAverageTime(startStation, endStation);
+ */
