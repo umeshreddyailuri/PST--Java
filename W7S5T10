@@ -1,0 +1,42 @@
+class ThroneInheritance {
+
+    private String king;
+    private java.util.Map<String, java.util.List<String>> children;
+    private java.util.Set<String> dead;
+
+    public ThroneInheritance(String kingName) {
+        king = kingName;
+        children = new java.util.HashMap<>();
+        dead = new java.util.HashSet<>();
+
+        children.put(kingName, new java.util.ArrayList<>());
+    }
+
+    public void birth(String parentName, String childName) {
+        children.putIfAbsent(childName, new java.util.ArrayList<>());
+        children.get(parentName).add(childName);
+    }
+
+    public void death(String name) {
+        dead.add(name);
+    }
+
+    public java.util.List<String> getInheritanceOrder() {
+        java.util.List<String> order = new java.util.ArrayList<>();
+
+        dfs(king, order);
+
+        return order;
+    }
+
+    private void dfs(String person, java.util.List<String> order) {
+
+        if (!dead.contains(person)) {
+            order.add(person);
+        }
+
+        for (String child : children.get(person)) {
+            dfs(child, order);
+        }
+    }
+}
