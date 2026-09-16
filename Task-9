@@ -1,0 +1,39 @@
+import java.util.*;
+
+class Calculator {
+
+    // Addition
+    int add(int a, int b) {
+        return a + b;
+    }
+
+    // Division
+    double divide(int a, int b) {
+        if (b == 0) {
+            throw new ArithmeticException("Cannot divide by zero");
+        }
+
+        return (double) a / b;
+    }
+}
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+
+        Calculator calc = new Calculator();
+
+        // Test addition
+        int additionResult = calc.add(10, 20);
+
+        if (additionResult == 30) {
+            System.out.println("Test Passed");
+        } else {
+            System.out.println("Test Failed");
+        }
+
+        sc.close();
+    }
+}
