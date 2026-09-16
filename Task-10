@@ -1,0 +1,61 @@
+import java.util.*;
+
+class LoginSystem {
+
+    // Login validation
+    boolean login(String username, String password) {
+
+        // 1) Username value testing
+        if (username == null || username.trim().isEmpty()) {
+            return false;
+        }
+
+        // 2) Username: 3 to 20 characters
+        if (username.length() < 3 || username.length() > 20) {
+            return false;
+        }
+
+        // 3) Password: 6 to 20 characters
+        if (password.length() < 6 || password.length() > 20) {
+            return false;
+        }
+
+        // 4) Valid login credentials
+        return username.equals("admin") &&
+               password.equals("admin123");
+    }
+}
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+
+        int n = sc.nextInt();
+
+        LoginSystem system = new LoginSystem();
+
+        for (int i = 0; i < n; i++) {
+
+            String username = sc.next();
+            String password = sc.next();
+
+            try {
+
+                boolean result = system.login(username, password);
+
+                if (result) {
+                    System.out.println("SUCCESS");
+                } else {
+                    System.out.println("FAILURE");
+                }
+
+            } catch (Exception e) {
+                System.out.println("FAILURE");
+            }
+        }
+
+        sc.close();
+    }
+}
